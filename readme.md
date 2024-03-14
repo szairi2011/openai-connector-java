@@ -17,3 +17,9 @@ Two types of runners have been created for convenience:
 * The second is a SpringBoot application listening on port server.port=8082
 
 To run from an IDE, simply run one of the main classes, i.e. Main.java or OpenaiConnectorDemoApplication.java as java.
+
+NB: 
+- The application is set to relay network traffic through a forward proxy, i.e. squid, listening locally on port 3128 as per squid-proxy.yml deployed to -n misc. For this run below commands before starting the application locally:
+> kubectl apply -f squid-proxy.yml -n misc --> Deploy the proxy pod and a NodePort service
+> kubectl port-forward service/squid-service -n misc 3128:3128 --> Forward traffic from local port 3128 to the remote squid proxy pod listening also on port 3128 
+ 
