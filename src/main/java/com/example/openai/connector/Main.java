@@ -97,7 +97,7 @@ public class Main {
         MessageEntity message = MessageEntity.builder()
           .role("user")
           // .content("Generate java method that returns the sum of three numbers")
-          .content("Generate a SpringBoot rest controller java class with two methods one for handling GET requests and the second for Post requests")
+          .content("Generate a SpringBoot rest controller java class with two methods one for handling GET requests and the second for Post requests. The get will use a url-encoded request prameter called message that will hold a request message")
           .build();
 
         messages.add(message);
