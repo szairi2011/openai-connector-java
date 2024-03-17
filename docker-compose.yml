@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+
+  openai-connector-app-v1:
+    image: soulou2019/openai-connector:1.0
+    build:
+      context: ./
+      dockerfile: Dockerfile
