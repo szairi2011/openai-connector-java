@@ -32,3 +32,7 @@ spec:
       port: 3128
       targetPort: 3128
   type: NodePort
+
+  # kubectl apply -f squid-proxy.yml -n misc
+  # kubectl port-forward service/squid-service -n misc 3128:3128
+  # To check the deployment readiness use example -- > curl GET -x http://localhost:3128 -L http://www.google.com
