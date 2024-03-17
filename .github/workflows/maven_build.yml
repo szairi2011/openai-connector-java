@@ -30,7 +30,7 @@ jobs:
         cache: maven
     - name: Build with Maven
       run: mvn --batch-mode --update-snapshots verify
-    - name: Create directory for staging
+    - name: Create directory for staging to be included later as a gh release binary package
       run: mkdir staging && cp target/*.jar staging
     - name: Upload the packaged binaries to Github
       uses: actions/upload-artifact@v4
@@ -38,12 +38,18 @@ jobs:
         name: openai-connector
         path: staging
 
-  dockerize:
+  docker:
 
     runs-on: ubuntu-latest
 
     steps:
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with images: name/app
+
       - name: Login to Docker registry
+        if: github.event_name != 'pull_request'
         uses: docker/login-action@v3
         with:
           # Server address of docker registry
@@ -52,8 +58,10 @@ jobs:
           # Password or personal registry api access token
           password: dckr_pat_SjgEiOU8LRuPLQ4dtWKxL9jtQ4o
 
-      - run: docker compose build
-      - run: docker compose push
+      - name: Build and push Docker image
+        if: github.event_name != 'pull_request'
+        run: docker compose build && docker compose push
+#      - run:
 #      - name: Upload the path to the Docker image
 #        uses: actions/upload-artifact@v4
 #        with:
