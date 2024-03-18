@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.TimeUnit;
 
+import com.example.openai.connector.configurations.SpringContextHolder;
 import org.devlive.sdk.openai.OpenAiClient;
 import org.devlive.sdk.openai.entity.ChatEntity;
 import org.devlive.sdk.openai.entity.MessageEntity;
@@ -19,13 +20,14 @@ import org.devlive.sdk.openai.model.CompletionModel;
 import org.devlive.sdk.openai.response.ChatResponse;
 
 import okhttp3.OkHttpClient;
+import org.springframework.core.env.Environment;
 
 public class OpenAIClientWrapper {
 
   private String OPENAI_API_TOKEN = null;
   private static OpenAIClientWrapper INSTANCE;
   private OpenAiClient client;
-  Properties props;
+  Environment env;
 
   public static OpenAIClientWrapper getInstance() {
     if (INSTANCE == null)
@@ -46,21 +48,8 @@ public class OpenAIClientWrapper {
     // Or else client will need to create the file src/main/resources/aopenai.config
     // #openai.api.token = <OPENAI_API_TOKEN>
     if (OPENAI_API_TOKEN == null) {
-      try (InputStream input = Main.class
-          .getClassLoader()
-          .getResourceAsStream("aopenai.config")) {
-
-        props = new Properties();
-
-        // load a properties file
-        props.load(input);
-
-        // get the property value and print it out
-        OPENAI_API_TOKEN = props.getProperty("openai.api.token");
-
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+      env = SpringContextHolder.getApplicationContext().getEnvironment();
+      OPENAI_API_TOKEN = env.getProperty("openai.api.token");
     }
 
     System.out.println("Loaded openai token from config file: " + OPENAI_API_TOKEN);
@@ -72,9 +61,9 @@ public class OpenAIClientWrapper {
     String PROXY_PORT = System.getenv("PROXY_PORT");
 
     if (USE_PROXY == null) { // If env vars are not set we fall back to use con props if they exist
-      USE_PROXY = props.getProperty("proxy.use");
-      PROXY_HOST = props.getProperty("proxy.host");
-      PROXY_PORT = props.getProperty("proxy.port");
+      USE_PROXY = env.getProperty("proxy.use");
+      PROXY_HOST = env.getProperty("proxy.host");
+      PROXY_PORT = env.getProperty("proxy.port");
     }
 
     if (null != USE_PROXY && USE_PROXY.equals("true") ) {
