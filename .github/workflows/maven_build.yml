@@ -79,5 +79,5 @@ jobs:
           file: ./Dockerfile
           push: ${{ github.event_name != 'pull_request' }}
 #          tags: ${{ steps.meta.outputs.tags }}
-          tags: ${{secrets.DOCKER_USERNAME}}//${{github.repository}}:latest
+          tags: ${{secrets.DOCKER_USERNAME}}/openai-connector-java:latest
           labels: ${{ steps.meta.outputs.labels }}
