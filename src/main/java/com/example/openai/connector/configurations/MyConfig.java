@@ -7,7 +7,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.core.env.Environment;
 
 @Configuration
-@PropertySource("classpath:aopenai.config")
+@PropertySource("classpath:application-custom.properties")
 public class MyConfig {
     @Autowired
     private Environment env;

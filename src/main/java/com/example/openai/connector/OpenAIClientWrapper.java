@@ -45,7 +45,7 @@ public class OpenAIClientWrapper {
     // Get the api token from an env variable if it is set up
     OPENAI_API_TOKEN = System.getenv("OPENAI_API_TOKEN");
 
-    // Or else client will need to create the file src/main/resources/aopenai.config
+    // Or else client will need to create the file src/main/resources/application-custom.properties
     // #openai.api.token = <OPENAI_API_TOKEN>
     if (OPENAI_API_TOKEN == null) {
       env = SpringContextHolder.getApplicationContext().getEnvironment();

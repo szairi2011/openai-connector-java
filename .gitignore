@@ -5,7 +5,7 @@ target/
 !**/src/test/**/target/
 
 # Ignore token
-src/main/resources/aopenai.config
+src/main/resources/application-custom.properties
 
 ### STS ###
 .apt_generated
