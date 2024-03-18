@@ -63,6 +63,17 @@
 				</configuration>
 			</plugin>
 		</plugins>
+		<resources>
+			<resource>
+				<filtering>true</filtering>
+				<directory>C:\Users\e1079458\work\learn-springboot\openai-connector-demo\src\main\resources</directory>
+				<includes>
+					<include>**/application*.yml</include>
+					<include>**/application*.yaml</include>
+					<include>**/application*.properties</include>
+				</includes>
+			</resource>
+		</resources>
 	</build>
 
 </project>
