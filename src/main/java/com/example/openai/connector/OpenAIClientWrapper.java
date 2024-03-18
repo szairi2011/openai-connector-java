@@ -24,8 +24,8 @@ public class OpenAIClientWrapper {
 
   private String OPENAI_API_TOKEN = null;
   private static OpenAIClientWrapper INSTANCE;
-
   private OpenAiClient client;
+  Properties props;
 
   public static OpenAIClientWrapper getInstance() {
     if (INSTANCE == null)
@@ -43,20 +43,20 @@ public class OpenAIClientWrapper {
     // Get the api token from an env variable if it is set up
     OPENAI_API_TOKEN = System.getenv("OPENAI_API_TOKEN");
 
-    // Or else client will need to create the file src/main/resources/secret.config
+    // Or else client will need to create the file src/main/resources/aopenai.config
     // #openai.api.token = <OPENAI_API_TOKEN>
     if (OPENAI_API_TOKEN == null) {
       try (InputStream input = Main.class
           .getClassLoader()
-          .getResourceAsStream("secret.config")) {
+          .getResourceAsStream("aopenai.config")) {
 
-        Properties prop = new Properties();
+        props = new Properties();
 
         // load a properties file
-        prop.load(input);
+        props.load(input);
 
         // get the property value and print it out
-        OPENAI_API_TOKEN = prop.getProperty("openai.api.token");
+        OPENAI_API_TOKEN = props.getProperty("openai.api.token");
 
       } catch (Exception e) {
         e.printStackTrace();
@@ -66,40 +66,63 @@ public class OpenAIClientWrapper {
     System.out.println("Loaded openai token from config file: " + OPENAI_API_TOKEN);
     // Use a forward proxy
 
-    InetSocketAddress proxyAddress = new InetSocketAddress("localhost", 3128);
+    // Set up an http proxy using either an en variable, e.g. case of K8s deployment, or a config property e.g. if to run locally
+    String USE_PROXY = System.getenv("USE_PROXY");
+    String PROXY_HOST = System.getenv("PROXY_HOST");
+    String PROXY_PORT = System.getenv("PROXY_PORT");
 
-    Proxy proxy = new Proxy(Proxy.Type.HTTP, proxyAddress);
+    if (USE_PROXY == null) { // If env vars are not set we fall back to use con props if they exist
+      USE_PROXY = props.getProperty("proxy.use");
+      PROXY_HOST = props.getProperty("proxy.host");
+      PROXY_PORT = props.getProperty("proxy.port");
+    }
 
-    // Create a proxy selector
-    ProxySelector proxySelector = new ProxySelector() {
-      @Override
-      public List<Proxy> select(URI uri) {
-        return List.of(proxy);
-      }
+    if (null != USE_PROXY && USE_PROXY.equals("true") ) {
 
-      @Override
-      public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
-        // Handle connection failures if needed
-      }
-    };
+      InetSocketAddress proxyAddress = new InetSocketAddress(PROXY_HOST, Integer.parseInt(PROXY_PORT));
 
-    // Configure OkHttpClient with the proxy selector
-    OkHttpClient.Builder builder = new OkHttpClient.Builder();
-    builder.proxySelector(proxySelector);
-    OkHttpClient okHttpClient = builder
-        .connectTimeout(10, TimeUnit.SECONDS)
-        .writeTimeout(10, TimeUnit.SECONDS)
-        .readTimeout(10, TimeUnit.SECONDS)
-        .build();
+      Proxy proxy = new Proxy(Proxy.Type.HTTP, proxyAddress);
 
-    client = OpenAiClient.builder()
-        .apiKey(OPENAI_API_TOKEN)
-        .timeout(100)
-        .client(okHttpClient) // The proxy shoul be set the last one otherwise it will reset the other props
-                              // like apikey
-        .build();
+      // Create a proxy selector
+      ProxySelector proxySelector = new ProxySelector() {
+        @Override
+        public List<Proxy> select(URI uri) {
+          return List.of(proxy);
+        }
 
-    System.err.println("An OpenAI client instance has been initialized ... ");
+        @Override
+        public void connectFailed(URI uri, SocketAddress sa, IOException ioe) {
+          // Handle connection failures if needed
+        }
+      };
+
+
+      // Configure OkHttpClient with the proxy selector
+      OkHttpClient.Builder builder = new OkHttpClient.Builder();
+      builder.proxySelector(proxySelector);
+      OkHttpClient okHttpClient = builder
+              .connectTimeout(10, TimeUnit.SECONDS)
+              .writeTimeout(10, TimeUnit.SECONDS)
+              .readTimeout(10, TimeUnit.SECONDS)
+              .build();
+
+      client = OpenAiClient.builder()
+              .apiKey(OPENAI_API_TOKEN)
+              .timeout(100)
+              .client(okHttpClient) // The proxy should be set the last one otherwise it will reset the other props
+              // like apikey
+              .build();
+
+      System.err.println("An OpenAI client instance has been initialized using proxy ");
+    }
+    else { // If no proxy settings required
+      client = OpenAiClient.builder()
+              .apiKey(OPENAI_API_TOKEN)
+              .timeout(100)
+              .build();
+
+      System.err.println("An OpenAI client instance has been initialized to connect without a proxy ");
+    }
 
     return client;
   }

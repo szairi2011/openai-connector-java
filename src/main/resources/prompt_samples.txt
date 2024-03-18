@@ -1,0 +1,2 @@
+// Prompt to generate a k8s manifest as follows
+Generate a K8s manifest to deploy a pod through a Deployment kind and an undelying clusterIP service. The pod name is openai-connector-java, and the service name is apenai-connector-service. The pod is using three env variables, i.e. USE_PROXY, PROXY_HOST, and PROXY_PORT.

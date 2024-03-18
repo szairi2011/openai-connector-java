@@ -30,7 +30,7 @@ public class Main {
     if (apiToken == null) {
       try (InputStream input = Main.class
           .getClassLoader()
-          .getResourceAsStream("secret.config")) {
+          .getResourceAsStream("aopenai.config")) {
 
         Properties prop = new Properties();
 
