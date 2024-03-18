@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: openai-connector-java-deployment
+  labels:
+    app: openai-connector-java
 spec:
   replicas: 1
   selector:
@@ -12,25 +14,31 @@ spec:
       labels:
         app: openai-connector-java
     spec:
-  containers:
-    - name: openai-connector-java
-      image: soulou2019/openai-connector-java:latest
-      env:
-        - name: USE_PROXY
-          value: "true"     # Set to "false" otherwise
-        - name: PROXY_HOST
-          value: "squid-service"
-        - name: PROXY_PORT
-          value: "3128"
-        - name: SPRINGBOOT_APPLICATION_PORT # This env var is only set in the application-prod.properties
-          value: "8080"
-        - name: SPRING_PROFILES_ACTIVE # Activate the prod profile, i.e. use application-prod.properties, to pick up the values from the env vars
-          value: prod
+      containers:
+        - name: openai-connector-java
+          image: soulou2019/openai-connector-java:latest
+          ports:
+            - containerPort: 8080 # Expose the springboot port outside the container
+              name: springboot
+              protocol: TCP
+          env:
+            - name: USE_PROXY
+              value: "true"     # Set to "false" otherwise
+            - name: PROXY_HOST
+              value: "squid-service"
+            - name: PROXY_PORT
+              value: "3128"
+            - name: SPRINGBOOT_APPLICATION_PORT # This env var is only set in the application-prod.properties
+              value: "8080"
+            - name: SPRING_PROFILES_ACTIVE # Activate the prod profile, i.e. use application-prod.properties, to pick up the values from the env vars
+              value: prod
 ---
 apiVersion: v1
 kind: Service
 metadata:
   name: apenai-connector-service
+  labels:
+    app: openai-connector-java
 spec:
   selector:
     app: openai-connector-java
@@ -39,3 +47,5 @@ spec:
       port: 80
       targetPort: 8080 # This corresponds to the SpringBoot server.port as per env variable above
   type: ClusterIP
+
+# kubectl apply -f k8s.deployment.yml -n misc
