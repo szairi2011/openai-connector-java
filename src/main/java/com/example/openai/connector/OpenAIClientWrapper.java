@@ -20,13 +20,17 @@ import org.devlive.sdk.openai.model.CompletionModel;
 import org.devlive.sdk.openai.response.ChatResponse;
 
 import okhttp3.OkHttpClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Component;
 
+//@Component
 public class OpenAIClientWrapper {
 
   private String OPENAI_API_TOKEN = null;
   private static OpenAIClientWrapper INSTANCE;
   private OpenAiClient client;
+//  @Autowired
   Environment env;
 
   public static OpenAIClientWrapper getInstance() {
