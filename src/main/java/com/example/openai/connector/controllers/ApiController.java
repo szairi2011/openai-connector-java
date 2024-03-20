@@ -10,7 +10,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api")
 public class ApiController {
-//    @Autowired()
+    @Autowired()
     OpenAIClientWrapper client;
 
     /**
@@ -19,7 +19,7 @@ public class ApiController {
      * @param openAIClientWrapper the mock OpenAIClientWrapper object
      */
     public ApiController(OpenAIClientWrapper openAIClientWrapper) {
-        client = OpenAIClientWrapper.getInstance();
+        client = openAIClientWrapper;
     }
 
     // Empty constructor
@@ -28,7 +28,7 @@ public class ApiController {
 
     @GetMapping("/prompt/{message}")
     public String getAiResponse(@PathVariable String message ) {
-        OpenAIClientWrapper client = OpenAIClientWrapper.getInstance();
+//        OpenAIClientWrapper client = OpenAIClientWrapper.getInstance();
         String response = client.send(message);
         if (response == null)
          return "Hello, GET request!";
@@ -38,7 +38,7 @@ public class ApiController {
     @PostMapping("/prompt")
     public String postAiResponse(@RequestBody Map<String, String> json) {
         String prompt = json.get("message");
-        OpenAIClientWrapper client = OpenAIClientWrapper.getInstance();
+//        OpenAIClientWrapper client = OpenAIClientWrapper.getInstance();
         String response = client.send(prompt);
         return response;
     }
