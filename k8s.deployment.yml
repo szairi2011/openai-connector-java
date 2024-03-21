@@ -18,7 +18,7 @@ spec:
         - name: openai-connector-java
           image: soulou2019/openai-connector-java:latest
           ports:
-            - containerPort: 8080 # Expose the springboot port outside the container
+            - containerPort: 8081 # Expose the springboot port outside the container
               name: springboot
               protocol: TCP
           imagePullPolicy: Always
@@ -30,7 +30,7 @@ spec:
             - name: PROXY_PORT
               value: "3128"
             - name: SPRINGBOOT_APPLICATION_PORT # This env var is only set in the application-prod.properties
-              value: "8080"
+              value: "8081"
             - name: SPRING_PROFILES_ACTIVE # Activate the prod profile, i.e. use application-prod.properties, to pick up the values from the env vars
               value: prod
 ---
@@ -46,7 +46,7 @@ spec:
   ports:
     - name: http
       port: 80
-      targetPort: 8080 # This corresponds to the SpringBoot server.port as per env variable above
+      targetPort: 8081 # This corresponds to the SpringBoot server.port as per env variable above
   type: ClusterIP
 
 # kubectl apply -f k8s.deployment.yml -n misc
