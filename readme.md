@@ -40,13 +40,13 @@ To Deploy the containerized version of the app on Kubernetes cluster, two ways e
 
 #### Deploy using Kubectl
 Run below commands:
-1. Deploy Squid as a forward proxy 
-> kubectl apply -f k8s.squid-proxy.yml -n misc --> Deploy the proxy pod and a NodePort service
-2. Deploy the app
-> kubectl apply -f k8s.deployment.yml -n misc
-3. Use Postman to connect on e.g. localhost:8082/prompt and  send messages
->  kubectl port-forward service/apenai-connector-service 8082:80 -n misc
-
-
+```sh
+# Deploy Squid as a forward proxy 
+kubectl apply -f k8s.squid-proxy.yml -n misc --> Deploy the proxy pod and a NodePort service
+# Deploy the app
+kubectl apply -f k8s.deployment.yml -n misc
+# Use Postman to connect on e.g. localhost:8082/prompt and  send messages
+kubectl port-forward service/apenai-connector-service 8082:80 -n misc
+```
 
 #### Deploy through Argo CD GitOps pipeline
